@@ -3,7 +3,10 @@ pub mod lane_specs;
 
 pub use self::geometry::intersection_polygon;
 use crate::raw::{DrivingSide, OriginalIntersection, OriginalRoad, RawMap, RawRoad};
-use crate::{IntersectionType, LaneType, NORMAL_LANE_THICKNESS, SIDEWALK_THICKNESS};
+use crate::{
+    osm, IntersectionType, LaneType, NORMAL_LANE_THICKNESS, SERVICE_ROAD_THICKNESS,
+    SIDEWALK_THICKNESS,
+};
 use abstutil::{Tags, Timer};
 use geom::{Bounds, Distance, PolyLine, Pt2D};
 use std::collections::{BTreeMap, BTreeSet};
@@ -33,7 +36,7 @@ impl Road {
         let mut sidewalk_right = false;
         let mut sidewalk_left = false;
         for l in &lane_specs {
-            total_width += l.width();
+            total_width += l.width;
             if l.lane_type == LaneType::Sidewalk {
                 if l.reverse_pts {
                     sidewalk_left = true;
@@ -125,16 +128,7 @@ impl InitialMap {
 pub struct LaneSpec {
     pub lane_type: LaneType,
     pub reverse_pts: bool,
-}
-
-impl LaneSpec {
-    pub fn width(&self) -> Distance {
-        if self.lane_type == LaneType::Sidewalk {
-            SIDEWALK_THICKNESS
-        } else {
-            NORMAL_LANE_THICKNESS
-        }
-    }
+    pub width: Distance,
 }
 
 pub fn get_lane_specs(osm_tags: &Tags) -> Vec<LaneSpec> {
@@ -142,15 +136,31 @@ pub fn get_lane_specs(osm_tags: &Tags) -> Vec<LaneSpec> {
 
     let mut specs: Vec<LaneSpec> = Vec::new();
     for lane_type in side1_types {
+        let width = if lane_type == LaneType::Sidewalk {
+            SIDEWALK_THICKNESS
+        } else if osm_tags.is(osm::HIGHWAY, "service") {
+            SERVICE_ROAD_THICKNESS
+        } else {
+            NORMAL_LANE_THICKNESS
+        };
         specs.push(LaneSpec {
             lane_type,
             reverse_pts: false,
+            width,
         });
     }
     for lane_type in side2_types {
+        let width = if lane_type == LaneType::Sidewalk {
+            SIDEWALK_THICKNESS
+        } else if osm_tags.is(osm::HIGHWAY, "service") {
+            SERVICE_ROAD_THICKNESS
+        } else {
+            NORMAL_LANE_THICKNESS
+        };
         specs.push(LaneSpec {
             lane_type,
             reverse_pts: true,
+            width,
         });
     }
     if specs.is_empty() {

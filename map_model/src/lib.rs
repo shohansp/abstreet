@@ -42,6 +42,8 @@ use std::collections::BTreeMap;
 
 // TODO Minimize uses of these!
 pub const NORMAL_LANE_THICKNESS: Distance = Distance::const_meters(2.5);
+// TODO This name is confusing.
+pub const SERVICE_ROAD_THICKNESS: Distance = Distance::const_meters(1.5);
 pub const SIDEWALK_THICKNESS: Distance = Distance::const_meters(1.5);
 
 impl Cloneable for BusRouteID {}

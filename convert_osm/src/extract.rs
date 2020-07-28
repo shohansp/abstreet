@@ -391,7 +391,9 @@ fn is_road(tags: &mut Tags, opts: &Options) -> bool {
 
     // Service roads can represent lots of things, most of which we don't want to keep yet. What's
     // allowed here is just based on what's been encountered so far in Seattle and Kraków.
-    if highway == "service" && !tags.is("psv", "yes") && !tags.is("bus", "yes") {
+    if highway == "service"
+        && !(tags.is("psv", "yes") || tags.is("bus", "yes") || !tags.contains_key("service"))
+    {
         return false;
     }
 
