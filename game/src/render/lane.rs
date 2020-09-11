@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::helpers::ID;
-use crate::render::{DrawOptions, Renderable, OUTLINE_THICKNESS};
+use crate::render::{osm_rank_to_color, DrawOptions, Renderable, OUTLINE_THICKNESS};
 use geom::{Angle, ArrowCap, Distance, Line, PolyLine, Polygon, Pt2D};
 use map_model::{
     Direction, Lane, LaneID, LaneType, Map, Road, RoadID, TurnID, PARKING_SPOT_LENGTH,
@@ -40,14 +40,8 @@ impl DrawLane {
         if !lane.is_light_rail() {
             draw.push(
                 match lane.lane_type {
-                    LaneType::Driving => app.cs.driving_lane,
-                    LaneType::Bus => app.cs.bus_lane,
-                    LaneType::Parking => app.cs.parking_lane,
                     LaneType::Sidewalk | LaneType::Shoulder => app.cs.sidewalk,
-                    LaneType::Biking => app.cs.bike_lane,
-                    LaneType::SharedLeftTurn => app.cs.driving_lane,
-                    LaneType::Construction => app.cs.parking_lane,
-                    LaneType::LightRail => unreachable!(),
+                    _ => osm_rank_to_color(&app.cs, road.get_rank()),
                 },
                 self.polygon.clone(),
             );

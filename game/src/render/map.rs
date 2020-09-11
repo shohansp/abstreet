@@ -202,7 +202,7 @@ impl DrawMap {
                 } else if r.is_private() {
                     cs.private_road
                 } else {
-                    rank_to_color(cs, r.get_rank())
+                    rank_to_unzoomed_color(cs, r.get_rank())
                 },
             ));
         }
@@ -216,7 +216,7 @@ impl DrawMap {
                     } else if i.is_private(map) {
                         cs.private_road
                     } else {
-                        rank_to_color(cs, i.get_rank(map))
+                        rank_to_unzoomed_color(cs, i.get_rank(map))
                     }
                 } else {
                     cs.unzoomed_interesting_intersection
@@ -515,7 +515,7 @@ impl UnzoomedAgents {
     }
 }
 
-fn rank_to_color(cs: &ColorScheme, rank: osm::RoadRank) -> Color {
+fn rank_to_unzoomed_color(cs: &ColorScheme, rank: osm::RoadRank) -> Color {
     match rank {
         osm::RoadRank::Highway => cs.unzoomed_highway,
         osm::RoadRank::Arterial => cs.unzoomed_arterial,

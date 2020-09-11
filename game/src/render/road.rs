@@ -1,6 +1,6 @@
 use crate::app::App;
 use crate::helpers::ID;
-use crate::render::{DrawOptions, Renderable};
+use crate::render::{osm_rank_to_color, DrawOptions, Renderable};
 use geom::{Distance, Polygon, Pt2D};
 use map_model::{Map, Road, RoadID};
 use std::cell::RefCell;
@@ -86,9 +86,9 @@ impl Renderable for DrawRoad {
                             app.cs.road_center_line
                         };
                         let bg = if r.is_private() {
-                            app.cs.driving_lane.lerp(app.cs.private_road, 0.5)
+                            osm_rank_to_color(&app.cs, r.get_rank()).lerp(app.cs.private_road, 0.5)
                         } else {
-                            app.cs.driving_lane
+                            osm_rank_to_color(&app.cs, r.get_rank())
                         };
 
                         if false {
