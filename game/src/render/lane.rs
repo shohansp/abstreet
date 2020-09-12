@@ -54,7 +54,20 @@ impl DrawLane {
         }
         match lane.lane_type {
             LaneType::Sidewalk => {
-                draw.extend(app.cs.sidewalk_lines, calculate_sidewalk_lines(lane));
+                //draw.extend(app.cs.sidewalk_lines, calculate_sidewalk_lines(lane));
+                let thickness = Distance::meters(0.25);
+                draw.push(
+                    app.cs.sidewalk_lines,
+                    lane.lane_center_pts
+                        .must_shift_right((lane.width - thickness) / 2.0)
+                        .make_polygons(thickness),
+                );
+                draw.push(
+                    app.cs.sidewalk_lines,
+                    lane.lane_center_pts
+                        .must_shift_left((lane.width - thickness) / 2.0)
+                        .make_polygons(thickness),
+                );
             }
             LaneType::Shoulder => {}
             LaneType::Parking => {
