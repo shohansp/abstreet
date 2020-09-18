@@ -1,4 +1,4 @@
-mod app;
+/*mod app;
 mod challenges;
 mod colors;
 mod common;
@@ -14,4 +14,4 @@ mod main;
 mod options;
 mod pregame;
 mod render;
-mod sandbox;
+mod sandbox;*/
