@@ -171,7 +171,7 @@ impl<'a> Timer<'a> {
         }
         #[cfg(target_arch = "wasm32")]
         {
-            stdweb::console!(log, "%s", &line);
+            // TODO websys
         }
         if let Some(ref mut sink) = maybe_sink {
             sink.println(line);

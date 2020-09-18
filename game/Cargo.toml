@@ -4,6 +4,9 @@ version = "0.1.0"
 authors = ["Dustin Carlino <dabreegster@gmail.com>"]
 edition = "2018"
 
+[lib]
+crate-type = ["cdylib", "rlib"]
+
 # TODO Can't toggle based on target_arch. https://github.com/rust-lang/cargo/issues/2524
 # cargo web start --target wasm32-unknown-unknown --no-default-features --features wasm
 [features]
