@@ -1,9 +1,8 @@
 use crate::{
-    svg, text, Canvas, Color, Drawable, Event, GeomBatch, GfxCtx, Line, Prerender, ScreenDims,
-    ScreenPt, Style, Text, UserInput,
+    svg, text, Canvas, Color, Drawable, Event, GeomBatch, GfxCtx, HorizontalAlignment, Line, Panel,
+    Prerender, ScreenDims, Style, Text, UserInput, VerticalAlignment, Widget,
 };
 use abstutil::{elapsed_seconds, Timer, TimerSink};
-use geom::Polygon;
 use instant::Instant;
 use std::collections::VecDeque;
 
@@ -164,26 +163,43 @@ impl<'a> LoadingScreen<'a> {
             return;
         }
         self.last_drawn = Instant::now();
+        let mut ctx = EventCtx {
+            fake_mouseover: true,
+            input: UserInput::new(Event::NoOp, &self.canvas),
+            canvas: &mut self.canvas,
+            prerender: self.prerender,
+            style: &mut self.style,
+            updates_requested: vec![],
+        };
 
         let mut txt = Text::from(Line(&self.title).small_heading());
         for l in &self.lines {
             txt.add(Line(l));
         }
+        let panel = Panel::new(
+            Widget::row(vec![
+                Widget::draw_batch(
+                    &ctx,
+                    GeomBatch::load_svg(ctx.prerender, "system/assets/tools/loading.svg")
+                        .scale(5.0),
+                )
+                .centered_vert(),
+                Widget::draw_batch(
+                    &ctx,
+                    txt.inner_render(&ctx.prerender.assets, svg::LOW_QUALITY),
+                )
+                .container()
+                .bg(text::BG_COLOR),
+            ])
+            .centered(),
+        )
+        .exact_size_percent(80, 80)
+        .aligned(HorizontalAlignment::Center, VerticalAlignment::Center)
+        .build_custom(&mut ctx);
 
         let mut g = GfxCtx::new(self.prerender, &self.canvas, &self.style, false);
         g.clear(Color::BLACK);
-
-        let mut batch = GeomBatch::from(vec![(
-            text::BG_COLOR,
-            Polygon::rectangle(0.8 * g.canvas.window_width, 0.8 * g.canvas.window_height),
-        )]);
-        batch.append(txt.inner_render(&g.prerender.assets, svg::LOW_QUALITY));
-        let draw = g.upload(batch);
-        g.redraw_at(
-            ScreenPt::new(0.1 * g.canvas.window_width, 0.1 * g.canvas.window_height),
-            &draw,
-        );
-
+        panel.draw(&mut g);
         g.prerender.inner.draw_finished(g.inner);
     }
 }
